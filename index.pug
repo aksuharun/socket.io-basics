@@ -1,0 +1,7 @@
+body
+	script(src="https://cdn.socket.io/4.7.4/socket.io.min.js")
+	script const socket = io();
+	h1 send message 
+	form(action="/" method="post")
+		input(type="text" name="message" placeholder="enter a message")
+		input(type="submit" value="send")
