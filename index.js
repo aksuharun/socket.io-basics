@@ -8,7 +8,11 @@ import { dirname, join } from 'node:path';
 
 const app = express()
 const server = createServer(app)
-const io = new Server(server)
+const io = new Server(server, {
+	connectionStateRecovery: {}
+})
+
+const port = 3000
 
 app.use(express.json())
 app.use(express.urlencoded())
@@ -20,20 +24,25 @@ app.get('/', (req, res) =>{
 	res.render(join(__dirname, "index.pug"))
 })
 
-// Socket.IO
+
+
 io.on('connection', (socket) => {
-  console.log('a user connected');
-	
-	socket.on('message:', (msg) => {
-		io.emit('message', msg)
+	socket.emit('system-message', 'A user connected!')
+
+	socket.on('chat-message:', (msg) => {
+		io.emit('chat-message', msg)
 	})
 	
-	socket.on('disconnect', ()=>{
-		console.log('a user disconnected')
+	socket.on('system-message', (msg) => {
+		io.emit('system-message', msg)
+	})
+	
+	socket.on('disconnecting', () => {
+		io.emit('system-message', 'A user disconnected!')
 	})
 })
 
 
 server.listen(3000,()=>{
-	console.log("Server is listening")
+	console.log("Server is listening on http://localhost:" + port)
 })

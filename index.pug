@@ -15,26 +15,37 @@ body
 			border:2px solid grey;
 			height: 20rem;
 			margin: 1rem 0;
-			overflow-y:'';
+			overflow-y: scroll;
 		}
 
 		.message-box{
 			list-style:none;
 			padding:.5rem;
 		}
+
 		.message-box:nth-of-type(odd){
 			background-color: #eee
 		}
 
+		.system-message-box{
+			width: 10rem;
+			margin:0.5rem auto;
+			padding: .2rem;
+			background-color:#ee7;
+			border-radius: 4px;
+			text-align: center;
+			list-style: none;
+		}
+
 		#input{
-			width: 85%;
 			padding: .5rem;
-			border: 1px solid;
 			border-radius: 5px;
 		}
-		#input+input[type="submit"]{
-			width: 15%;
-			padding: .5rem;
+
+		.bottom-bar{
+			display:grid;
+			grid-template-columns: minmax(300px ,4fr)	6rem 6rem;
+			gap: .5rem
 		}
 
 
@@ -44,14 +55,14 @@ body
 		h1 Chat Room
 		div#chat
 		form(id="form" action="")
-			input(
-				id="input"
-				type="text"
-				name="message"
-				placeholder="enter a message"
-				autocomplate="off"
-				)
-			input(type="submit" value="send")
+			.bottom-bar
+				input(
+					id="input"
+					placeholder="enter a message"
+					autocomplate="off"
+					)
+				button Send
+				button#toggle-btn Disconnect
 
 	script(src="https://cdn.socket.io/4.7.4/socket.io.min.js")
 	script.
@@ -60,22 +71,40 @@ body
 		const form = document.getElementById('form') 
 		const input = document.getElementById('input') 
 		const chat = document.getElementById('chat')
-
-		console.log(form)
+		const toggleBtn = document.getElementById('toggle-btn')
 
 		form.addEventListener('submit', (e) => {
 			e.preventDefault()
 			if(input.value) {
-				socket.emit('message:', input.value)
+				socket.emit('chat-message:', input.value)
 				input.value = ''
 			}
 		})
 
-		socket.on('message', (msg) => {
-			console.log(msg)
+		socket.on('chat-message', (msg) => {
 			item = document.createElement('li')
 			item.classList.add('message-box')
 			item.textContent = msg
 			chat.appendChild(item)
 
+		})
+
+		socket.on('system-message', (msg) => {
+			console.log(msg)
+			item = document.createElement('li')
+			item.classList.add('system-message-box')
+			item.textContent = msg
+			chat.appendChild(item)
+		})
+
+		toggleBtn.addEventListener('click', (e) => {
+			e.preventDefault()
+
+			if(socket.connected) {
+				toggleBtn.innerText = 'Connect'
+				socket.disconnect()
+			} else {
+				toggleBtn.innerText = 'Disconnect'
+				socket.connect()
+			}
 		})
