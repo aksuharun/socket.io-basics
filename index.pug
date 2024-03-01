@@ -1,7 +1,81 @@
 body
+	//css
+	style.
+		*{
+			margin: 0;
+			padding: 0; 
+		}
+
+		main{
+			width: min(calc(100vw - 2rem), 600px);
+			margin: auto;
+			padding: 1rem;
+		}
+		#chat{
+			border:2px solid grey;
+			height: 20rem;
+			margin: 1rem 0;
+			overflow-y:'';
+		}
+
+		.message-box{
+			list-style:none;
+			padding:.5rem;
+		}
+		.message-box:nth-of-type(odd){
+			background-color: #eee
+		}
+
+		#input{
+			width: 85%;
+			padding: .5rem;
+			border: 1px solid;
+			border-radius: 5px;
+		}
+		#input+input[type="submit"]{
+			width: 15%;
+			padding: .5rem;
+		}
+
+
+
+	//html body
+	main
+		h1 Chat Room
+		div#chat
+		form(id="form" action="")
+			input(
+				id="input"
+				type="text"
+				name="message"
+				placeholder="enter a message"
+				autocomplate="off"
+				)
+			input(type="submit" value="send")
+
 	script(src="https://cdn.socket.io/4.7.4/socket.io.min.js")
-	script const socket = io();
-	h1 send message 
-	form(action="/" method="post")
-		input(type="text" name="message" placeholder="enter a message")
-		input(type="submit" value="send")
+	script.
+		const socket = io();
+
+		const form = document.getElementById('form') 
+		const input = document.getElementById('input') 
+		const chat = document.getElementById('chat')
+
+		console.log(form)
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault()
+			if(input.value) {
+				socket.emit('message:', input.value)
+				input.value = ''
+			}
+		})
+
+		socket.on('message', (msg) => {
+			console.log(msg)
+			item = document.createElement('li')
+			item.classList.add('message-box')
+			item.textContent = msg
+			chat.appendChild(item)
+
+		})

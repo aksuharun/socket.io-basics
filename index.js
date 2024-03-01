@@ -20,17 +20,16 @@ app.get('/', (req, res) =>{
 	res.render(join(__dirname, "index.pug"))
 })
 
-app.post('/', (req, res) => {
-	const message = req.body.message
-	console.log(message)
-	res.redirect('/')
-})
-
 // Socket.IO
 io.on('connection', (socket) => {
   console.log('a user connected');
+	
+	socket.on('message:', (msg) => {
+		io.emit('message', msg)
+	})
+	
 	socket.on('disconnect', ()=>{
-		console.log('user disconnected')
+		console.log('a user disconnected')
 	})
 })
 
